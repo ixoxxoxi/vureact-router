@@ -4,461 +4,179 @@
 
 # @vureact/router
 
-Vue Router 4.x 风格的 React 18+ 路由适配器（基于 React Router DOM 7.9+ 封装）
+**把 Vue Router 4.x 的使用习惯带到 React。**
 
-[![Npm](https://img.shields.io/npm/v/@vureact/router.svg?label=Npm&style=flat-square)](https://router.vureact.top/)
-[![Total Downloads](https://img.shields.io/npm/dt/@vureact/router?label=Total%20Downloads&style=flat-square)](https://www.npmjs.com/package/@vureact/router)
-[![Monthly Downloads](https://img.shields.io/npm/dm/@vureact/router?label=Monthly%20Downloads&style=flat-square)](https://www.npmjs.com/package/@vureact/router)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![React 18+](https://img.shields.io/badge/React-18%2B-61dafb)](https://reactjs.org/)
+> 一个面向 React 的 Vue Router 风格路由适配器。  
+>
+> 基于 React Router DOM 7.9+ 构建，提供熟悉的 `createRouter`、`RouterLink`、`RouterView`、`useRouter`、`useRoute`、导航守卫与路由元信息能力等。
+
+[![Npm](https://img.shields.io/npm/v/@vureact/router.svg?label=Npm&style=flat-square)](https://www.npmjs.com/package/@vureact/router)
+[![Downloads](https://img.shields.io/npm/dt/@vureact/router?label=Downloads&style=flat-square)](https://www.npmjs.com/package/@vureact/router)
+[![Monthly](https://img.shields.io/npm/dm/@vureact/router?label=Monthly&style=flat-square)](https://www.npmjs.com/package/@vureact/router)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/vureact-js/vureact-router/blob/master/LICENSE)
+[![React >=18](https://img.shields.io/badge/React->=18-61dafb)](https://reactjs.org/)
+
+[文档](https://router.vureact.top) · [快速开始](https://router.vureact.top/guide/quick-start.html) · [API](https://router.vureact.top/api/create-router.html) · [npm](https://www.npmjs.com/package/@vureact/router) · [问题反馈](https://github.com/vureact-js/vureact-router/issues)
 
 简体中文 | [English](./README.en.md)
 
 </div>
 
-## ✨ 特性
+## 为什么会有这个项目
 
-- **Vue Router API 兼容性**: 为从 Vue.js 转向 React 的开发者提供熟悉的 API
-- **基于 React Router DOM**: 基于稳定且功能丰富的 React Router DOM 7.9+ 构建
-- **TypeScript 优先**: 完整的 TypeScript 支持，提供全面的类型定义
-- **路由守卫**: 支持 `beforeEach`、`beforeResolve`、`afterEach` 导航守卫
-- **异步组件**: 内置代码分割和懒加载支持
-- **动态路由**: 支持编程式路由添加和操作
-- **嵌套路由**: 完整的嵌套路由配置支持
-- **路由元信息**: 为路由附加元数据以支持自定义逻辑
-- **活动链接类**: 自动管理活动链接的 CSS 类
-- **多种历史模式**: 支持 hash、browser 和 memory 历史模式
+如果你正在把 Vue 项目迁移到 React，路由通常是最难“心智平移”的部分之一。
 
-## 📦 安装
+`@vureact/router` 的目标不是重新发明一套路由系统，而是让你在 React 中继续使用尽可能接近 Vue Router 4.x 的开发方式，包括：
 
-```bash
-npm install @vureact/router
-# 或
-yarn add @vureact/router
-# 或
-pnpm add @vureact/router
-```
+- `createRouter`
+- `createWebHashHistory` / `createWebHistory`
+- `RouterLink` / `RouterView`
+- `useRouter` / `useRoute`
+- `beforeEach` / `afterEach` / `beforeResolve`
+- 路由元信息、嵌套路由、动态路由
 
-### 对等依赖
+底层仍然基于 React Router DOM，因此它不是一个脱离 React 生态的孤立实现。
 
-- React >= 18.2.0
-- React DOM >= 18.2.0
-- React Router DOM >= 7.9.0
+## 核心特性
 
-## 🚀 快速开始
+- **Vue Router 风格 API**：适合熟悉 Vue Router 的开发者快速迁移
+- **基于 React Router DOM 7.9+**：复用成熟的 React 路由基础设施
+- **完整 TypeScript 支持**：覆盖路由配置、导航、守卫和 hooks
+- **导航守卫**：支持全局守卫和组件级守卫
+- **嵌套路由与路由元信息**：保留 Vue Router 常见组织方式
+- **异步组件与代码分割**：支持懒加载路由组件
+- **活动链接样式**：支持类似 `router-link-active` 的链接状态类名
 
-### 基础设置
+## 它适合谁
+
+- 正在把 Vue 3 + Vue Router 项目迁移到 React
+- 希望在 React 项目中保留 Vue Router 风格 API
+- 正在配合 `@vureact/compiler-core` 使用路由适配能力
+- 团队成员同时熟悉 Vue 和 React，希望减少切换成本
+
+## 最小示例
 
 ```tsx
 import { createRoot } from 'react-dom/client';
-import { createRouter, createWebHashHistory, RouterView, RouterLink } from '@vureact/router';
+import {
+  createRouter,
+  createWebHashHistory,
+  RouterLink,
+  RouterView,
+} from '@vureact/router';
 
-// 创建路由实例
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
-    {
-      path: '/',
-      component: <div>首页</div>,
-    },
-    {
-      path: '/about',
-      component: <div>关于页面</div>,
-    },
-    {
-      path: '/users/:id',
-      component: <div>用户资料</div>,
-    },
+    { path: '/', component: <div>首页</div> },
+    { path: '/about', component: <div>关于</div> },
   ],
 });
 
-// 应用组件
 function App() {
   return (
     <div>
       <nav>
         <RouterLink to="/">首页</RouterLink>
         <RouterLink to="/about">关于</RouterLink>
-        <RouterLink to="/users/123">用户 123</RouterLink>
       </nav>
       <RouterView />
     </div>
   );
 }
 
-// 渲染应用
 createRoot(document.getElementById('root')!).render(<router.RouterProvider />);
 ```
 
-## 📖 API 参考
+## 迁移时你会最常用到的能力
 
-### 核心函数
-
-#### `createRouter(options: RouterOptions): Router`
-
-使用给定配置创建路由实例。
-
-```tsx
-const router = createRouter({
-  routes: [...],
-  history: createWebHashHistory(),
-  linkActiveClass: 'active',
-  linkExactActiveClass: 'exact-active',
-});
-```
-
-#### `Router` 方法
-
-- `router.beforeEach(guard: GuardWithNextFn)`: 注册全局前置导航守卫
-- `router.beforeResolve(guard: GuardWithNextFn)`: 注册全局解析守卫
-- `router.afterEach(guard: AfterEachGuard)`: 注册全局后置导航守卫
-- `router.onError(handler: ErrorHandler)`: 注册全局错误处理器
-- `router.addRoute(route: RouteRecordRaw)`: 添加新路由
-- `router.addRoute(parentName: string, route: RouteRecordRaw)`: 添加嵌套路由
-- `router.hasRoute(name: string)`: 检查路由是否存在（通过名称）
-- `router.resolve(to: RouteLocationRaw)`: 解析路由位置
-- `router.getRoutes()`: 获取所有已注册路由
-- `router.clearAll()`: 清除所有路由和守卫
-
-### 组件
-
-#### `RouterView`
-
-渲染匹配的路由组件。
-
-```tsx
-<RouterView customRender={(component, route) => <div>{component}</div>} />
-```
-
-#### `RouterLink`
-
-用于在路由之间导航的组件。
-
-```tsx
-<RouterLink
-  to="/about"
-  activeClassName="active-link"
-  exactActiveClassName="exact-active-link"
-  custom={({ href, isActive, navigate }) => (
-    <button onClick={navigate} className={isActive ? 'active' : ''}>
-      前往关于页面
-    </button>
-  )}
->
-  关于
-</RouterLink>
-```
-
-### 钩子
-
-#### `useRouter()`
-
-用于编程式导航的钩子，访问路由实例。
+### 1. 编程式导航
 
 ```tsx
 import { useRouter } from '@vureact/router';
 
-function MyComponent() {
+function Toolbar() {
   const router = useRouter();
 
-  const handleClick = () => {
-    router.push('/about');
-    // 或
-    router.push({ path: '/about', query: { tab: 'info' } });
-  };
-
-  return <button onClick={handleClick}>前往关于页面</button>;
+  return <button onClick={() => router.push('/about')}>前往关于页</button>;
 }
 ```
 
-#### `useRoute()`
-
-访问当前路由信息的钩子。
+### 2. 获取当前路由
 
 ```tsx
 import { useRoute } from '@vureact/router';
 
-function MyComponent() {
+function CurrentRouteInfo() {
   const route = useRoute();
-
-  return (
-    <div>
-      <p>当前路径: {route.path}</p>
-      <p>查询参数: {JSON.stringify(route.query)}</p>
-      <p>路由参数: {JSON.stringify(route.params)}</p>
-      <p>路由元信息: {JSON.stringify(route.meta)}</p>
-    </div>
-  );
+  return <pre>{JSON.stringify(route, null, 2)}</pre>;
 }
 ```
 
-#### 路由守卫钩子
-
-- `useBeforeRouteEnter(guard: ComponentGuard)`: 组件级进入前守卫
-- `useBeforeRouteLeave(guard: ComponentGuard)`: 组件级离开前守卫
-- `useBeforeRouteUpdate(guard: ComponentGuard)`: 组件级更新前守卫
-
-### 路由配置
+### 3. 全局守卫
 
 ```tsx
-const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: HomePage,
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: 'dashboard',
-        name: 'dashboard',
-        component: Dashboard,
-        meta: { title: '仪表板' },
-      },
-    ],
-  },
-  {
-    path: '/login',
-    component: LoginPage,
-    meta: { guestOnly: true },
-  },
-  {
-    path: '/users/:id',
-    component: UserProfile,
-    beforeEnter: (to, from) => {
-      // 组件特定守卫
-      if (!isAuthenticated()) {
-        return '/login';
-      }
-    },
-  },
-  {
-    path: '/async',
-    component: () => import('./AsyncComponent'),
-    meta: {
-      loadingComponent: <div>加载中...</div>,
-    },
-  },
-  {
-    path: '/redirect',
-    redirect: '/home',
-  },
-  {
-    path: '/custom-redirect',
-    redirect: { path: '/target', query: { from: 'custom' } },
-  },
-];
-```
-
-## 🔒 路由守卫
-
-### 全局守卫
-
-```tsx
-const router = createRouter({ routes });
-
-// 每次导航前
 router.beforeEach((to, from) => {
   if (to.meta.requiresAuth && !isAuthenticated()) {
     return '/login';
   }
-
-  if (to.meta.guestOnly && isAuthenticated()) {
-    return '/';
-  }
-
-  return true; // 继续导航
-});
-
-// 每次导航后
-router.afterEach((to, from) => {
-  // 分析跟踪
-  trackPageView(to.fullPath);
-});
-
-// 错误处理
-router.onError((error) => {
-  console.error('导航错误:', error);
+  return true;
 });
 ```
 
-### 组件守卫
+### 4. 组件级守卫
 
 ```tsx
-import { useBeforeRouteEnter, useBeforeRouteLeave } from '@vureact/router';
+import { useBeforeRouteLeave } from '@vureact/router';
 
-function UserProfile() {
-  useBeforeRouteEnter((to, from) => {
-    // 在组件挂载前调用
-    return fetchUserData(to.params.id);
-  });
-
-  useBeforeRouteLeave((to, from) => {
-    // 在离开组件前调用
+function EditorPage() {
+  useBeforeRouteLeave(() => {
     if (hasUnsavedChanges()) {
-      return confirm('您有未保存的更改。确定要离开吗？');
+      return confirm('您有未保存的更改，确定离开吗？');
     }
     return true;
   });
 
-  return <div>用户资料</div>;
+  return <div>编辑页</div>;
 }
 ```
 
-## 🔄 异步组件与代码分割
+## 与 Vue Router 的关系
 
-```tsx
-const routes = [
-  {
-    path: '/dashboard',
-    component: () => import('./Dashboard'),
-    meta: {
-      loadingComponent: <div className="loading-spinner">加载仪表板中...</div>,
-    },
-  },
-  {
-    path: '/admin',
-    component: lazy(() => import('./AdminPanel')),
-  },
-];
-```
+如果你已经熟悉 Vue Router，那么大多数 API 会很直观：
 
-## 🎨 活动链接样式
+| Vue Router | @vureact/router |
+| --- | --- |
+| `createRouter()` | `createRouter()` |
+| `<router-view>` | `<RouterView>` |
+| `<router-link>` | `<RouterLink>` |
+| `useRouter()` | `useRouter()` |
+| `useRoute()` | `useRoute()` |
+| 全局守卫 | 全局守卫 |
+| 路由元信息 | 路由元信息 |
 
-```css
-/* 默认类 */
-.router-link-active {
-  /* 当链接的路由处于活动状态时应用 */
-}
+它不是 Vue Router 的源码移植，而是在 React 语境里提供一套尽量贴近 Vue Router 的适配接口。
 
-.router-link-exact-active {
-  /* 当链接的路由完全匹配时应用 */
-}
+## 仓库结构
 
-/* 自定义类 */
-.active-link {
-  color: blue;
-  font-weight: bold;
-}
+- `packages/router`：npm 发布包 `@vureact/router`
 
-.exact-active-link {
-  color: red;
-  border-bottom: 2px solid red;
-}
-```
+## 文档入口
 
-```tsx
-<RouterLink to="/about" activeClassName="active-link" exactActiveClassName="exact-active-link">
-  关于
-</RouterLink>
-```
+- [介绍](https://router.vureact.top/guide/introduction.html)
+- [快速开始](https://router.vureact.top/guide/introduction.html)
+- [导航守卫](https://router.vureact.top/guide/guards.html)
+- [API 文档](https://router.vureact.top/api/)
+- [更新日志](https://router.vureact.top/guide/changelog.html)
 
-## 📝 TypeScript 支持
+## 相关项目
 
-完整的 TypeScript 支持，提供全面的类型定义：
+- [@vureact/compiler-core](https://vureact.top)
+- [@vureact/runtime-core](https://runtime.vureact.top)
 
-```tsx
-import type {
-  RouteRecordRaw,
-  RouteLocation,
-  RouteLocationOptions,
-  RouterOptions,
-  Router,
-} from '@vureact/router';
+## 贡献与许可证
 
-// 类型安全的路由配置
-const routes: RouteRecordRaw[] = [
-  {
-    path: '/users/:id',
-    name: 'user',
-    component: <UserProfile />,
-    meta: {
-      requiresAuth: true,
-      permissions: ['read'],
-    },
-  },
-];
+- [问题反馈](https://github.com/vureact-js/vureact-router/issues)
+- [贡献指南](./CONTRIBUTING.zh.md)
 
-// 类型安全的导航
-const router = useRouter();
-router.push({ name: 'user', params: { id: '123' } });
-```
-
-## 🔧 高级用法
-
-### 动态路由添加
-
-```tsx
-const router = createRouter({ routes: [] });
-
-// 动态添加路由
-router.addRoute({
-  path: '/dynamic',
-  component: <DynamicPage />,
-});
-
-// 添加嵌套路由
-router.addRoute('parent', {
-  path: 'child',
-  component: <ChildPage />,
-});
-```
-
-### 自定义查询参数解析
-
-```tsx
-const router = createRouter({
-  routes,
-  parseQuery: (search) => {
-    // 自定义查询参数解析逻辑
-    return customParse(search);
-  },
-  stringifyQuery: (query) => {
-    // 自定义查询参数序列化
-    return customStringify(query);
-  },
-});
-```
-
-### 路由解析
-
-```tsx
-const router = createRouter({ routes });
-
-// 解析路由位置
-const location = router.resolve('/users/123?tab=profile');
-// 或
-const location = router.resolve({
-  name: 'user',
-  params: { id: '123' },
-  query: { tab: 'profile' },
-});
-
-console.log(location.fullPath); // "/users/123?tab=profile"
-console.log(location.params); // { id: '123' }
-console.log(location.query); // { tab: 'profile' }
-```
-
-## 🤝 从 Vue Router 迁移
-
-如果您熟悉 Vue Router，您会发现 @vureact/router 非常相似：
-
-| Vue Router       | @vureact/router  | 说明                    |
-| ---------------- | ---------------- | ----------------------- |
-| `createRouter()` | `createRouter()` | 相同的 API              |
-| `<router-view>`  | `<RouterView>`   | React 中使用 PascalCase |
-| `<router-link>`  | `<RouterLink>`   | React 中使用 PascalCase |
-| `useRouter()`    | `useRouter()`    | 相同的 API              |
-| `useRoute()`     | `useRoute()`     | 相同的 API              |
-| 导航守卫         | 导航守卫         | 相同的守卫类型          |
-| 路由元信息       | 路由元信息       | 相同的功能              |
-| 嵌套路由         | 嵌套路由         | 相同的配置方式          |
-
-## 📄 许可证
-
-MIT © [Ryan John](./LICENSE)
-
-## 🔗 链接
-
-- [VuReact Router](https://router.vureact.top)
-- [贡献指南](../../CONTRIBUTING.zh.md)
-- [VuReact](https://vureact.top)
+MIT © Ruihong Zhong (Ryan John)

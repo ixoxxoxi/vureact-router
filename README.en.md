@@ -4,461 +4,180 @@
 
 # @vureact/router
 
-Vue Router 4.x Adapter for React 18+ (Encapsulated on React Router DOM 7.9+)
+**Bring Vue Router 4.x ergonomics to React.**
 
-[![Npm](https://img.shields.io/npm/v/@vureact/router.svg?label=Npm&style=flat-square)](https://router.vureact.top/en/)
-[![Total Downloads](https://img.shields.io/npm/dt/@vureact/router?label=Total%20Downloads&style=flat-square)](https://www.npmjs.com/package/@vureact/router)
-[![Monthly Downloads](https://img.shields.io/npm/dm/@vureact/router?label=Monthly%20Downloads&style=flat-square)](https://www.npmjs.com/package/@vureact/router)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![React 18+](https://img.shields.io/badge/React-18%2B-61dafb)](https://reactjs.org/)
+> A Vue Router-style router adapter for React.  
+>
+> Built on top of React Router DOM 7.9+, it provides familiar capabilities such as `createRouter`, `RouterLink`, `RouterView`, `useRouter`, `useRoute`, navigation guards, and route meta etc.
+
+[![Npm](https://img.shields.io/npm/v/@vureact/router.svg?label=Npm&style=flat-square)](https://www.npmjs.com/package/@vureact/router)
+[![Downloads](https://img.shields.io/npm/dt/@vureact/router?label=Downloads&style=flat-square)](https://www.npmjs.com/package/@vureact/router)
+[![Monthly](https://img.shields.io/npm/dm/@vureact/router?label=Monthly&style=flat-square)](https://www.npmjs.com/package/@vureact/router)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/vureact-js/vureact-router/blob/master/LICENSE)
+[![React >=18](https://img.shields.io/badge/React->=18-61dafb)](https://reactjs.org/)
+
+[Docs](https://router.vureact.top/en) · [Quick Start](https://router.vureact.top/en/guide/quick-start.html) · [API](https://router.vureact.top/en/api/create-router.html) · [npm](https://www.npmjs.com/package/@vureact/router) · [Issues](https://github.com/vureact-js/vureact-router/issues)
 
 English | [简体中文](./README.md)
 
 </div>
 
-## ✨ Features
+## Why this project exists
 
-- **Vue Router API Compatibility**: Familiar API for Vue.js developers transitioning to React
-- **Built on React Router DOM**: Leverages the stability and features of React Router DOM 7.9+
-- **TypeScript First**: Full TypeScript support with comprehensive type definitions
-- **Route Guards**: Support for `beforeEach`, `beforeResolve`, `afterEach` navigation guards
-- **Async Components**: Built-in support for code splitting with lazy loading
-- **Dynamic Routing**: Programmatic route addition and manipulation
-- **Nested Routes**: Full support for nested route configurations
-- **Route Meta Fields**: Attach metadata to routes for custom logic
-- **Active Link Classes**: Automatic CSS class management for active links
-- **Multiple History Modes**: Support for hash, browser, and memory history
+When migrating a Vue project to React, routing is often one of the hardest mental-model shifts.
 
-## 📦 Installation
+`@vureact/router` is not trying to reinvent routing. Its goal is to let you keep a Vue Router 4.x-like authoring style inside React, including:
 
-```bash
-npm install @vureact/router
-# or
-yarn add @vureact/router
-# or
-pnpm add @vureact/router
-```
+- `createRouter`
+- `createWebHashHistory` / `createWebHistory`
+- `RouterLink` / `RouterView`
+- `useRouter` / `useRoute`
+- `beforeEach` / `afterEach` / `beforeResolve`
+- route meta, nested routes, and dynamic routes
 
-### Peer Dependencies
+Under the hood, it still builds on React Router DOM, so it stays aligned with the React ecosystem.
 
-- React >= 18.2.0
-- React DOM >= 18.2.0
-- React Router DOM >= 7.9.0
+## Core features
 
-## 🚀 Quick Start
+- **Vue Router-style API** for teams familiar with Vue Router
+- **Built on React Router DOM 7.9+**
+- **Full TypeScript support**
+- **Navigation guards** at both global and component level
+- **Nested routes and route meta**
+- **Async components and code splitting**
+- **Active link styling** similar to Vue Router link states
 
-### Basic Setup
+## Who it is for
+
+- Teams migrating Vue 3 + Vue Router projects to React
+- React projects that want Vue Router-style APIs
+- Projects using `@vureact/compiler-core` and needing router adaptation
+- Mixed Vue/React teams that want to reduce context switching
+
+## Minimal example
 
 ```tsx
 import { createRoot } from 'react-dom/client';
-import { createRouter, createWebHashHistory, RouterView, RouterLink } from '@vureact/router';
+import {
+  createRouter,
+  createWebHashHistory,
+  RouterLink,
+  RouterView,
+} from '@vureact/router';
 
-// Create router instance
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
-    {
-      path: '/',
-      component: <div>Home Page</div>,
-    },
-    {
-      path: '/about',
-      component: <div>About Page</div>,
-    },
-    {
-      path: '/users/:id',
-      component: <div>User Profile</div>,
-    },
+    { path: '/', component: <div>Home</div> },
+    { path: '/about', component: <div>About</div> },
   ],
 });
 
-// App component
 function App() {
   return (
     <div>
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
-        <RouterLink to="/users/123">User 123</RouterLink>
       </nav>
       <RouterView />
     </div>
   );
 }
 
-// Render your app
 createRoot(document.getElementById('root')!).render(<router.RouterProvider />);
 ```
 
-## 📖 API Reference
+## The capabilities you will use most
 
-### Core Functions
-
-#### `createRouter(options: RouterOptions): Router`
-
-Creates a router instance with the given configuration.
-
-```tsx
-const router = createRouter({
-  routes: [...],
-  history: createWebHashHistory(),
-  linkActiveClass: 'active',
-  linkExactActiveClass: 'exact-active',
-});
-```
-
-#### `Router` Methods
-
-- `router.beforeEach(guard: GuardWithNextFn)`: Register global before navigation guard
-- `router.beforeResolve(guard: GuardWithNextFn)`: Register global before resolve guard
-- `router.afterEach(guard: AfterEachGuard)`: Register global after navigation guard
-- `router.onError(handler: ErrorHandler)`: Register global error handler
-- `router.addRoute(route: RouteRecordRaw)`: Add a new route
-- `router.addRoute(parentName: string, route: RouteRecordRaw)`: Add a nested route
-- `router.hasRoute(name: string)`: Check if a route exists by name
-- `router.resolve(to: RouteLocationRaw)`: Resolve a route location
-- `router.getRoutes()`: Get all registered routes
-- `router.clearAll()`: Clear all routes and guards
-
-### Components
-
-#### `RouterView`
-
-The component that renders the matched route component.
-
-```tsx
-<RouterView customRender={(component, route) => <div> {component}</div>} />
-```
-
-#### `RouterLink`
-
-A component for navigating between routes.
-
-```tsx
-<RouterLink
-  to="/about"
-  activeClassName="active-link"
-  exactActiveClassName="exact-active-link"
-  custom={({ href, isActive, navigate }) => (
-    <button onClick={navigate} className={isActive ? 'active' : ''}>
-      Go to About
-    </button>
-  )}
->
-  About
-</RouterLink>
-```
-
-### Hooks
-
-#### `useRouter()`
-
-Hook to access the router instance for programmatic navigation.
+### 1. Programmatic navigation
 
 ```tsx
 import { useRouter } from '@vureact/router';
 
-function MyComponent() {
+function Toolbar() {
   const router = useRouter();
 
-  const handleClick = () => {
-    router.push('/about');
-    // or
-    router.push({ path: '/about', query: { tab: 'info' } });
-  };
-
-  return <button onClick={handleClick}>Go to About</button>;
+  return <button onClick={() => router.push('/about')}>Go to About</button>;
 }
 ```
 
-#### `useRoute()`
-
-Hook to access the current route information.
+### 2. Accessing the current route
 
 ```tsx
 import { useRoute } from '@vureact/router';
 
-function MyComponent() {
+function CurrentRouteInfo() {
   const route = useRoute();
-
-  return (
-    <div>
-      <p>Current path: {route.path}</p>
-      <p>Query params: {JSON.stringify(route.query)}</p>
-      <p>Route params: {JSON.stringify(route.params)}</p>
-      <p>Route meta: {JSON.stringify(route.meta)}</p>
-    </div>
-  );
+  return <pre>{JSON.stringify(route, null, 2)}</pre>;
 }
 ```
 
-#### Route Guards Hooks
-
-- `useBeforeRouteEnter(guard: ComponentGuard)`: Component-level before enter guard
-- `useBeforeRouteLeave(guard: ComponentGuard)`: Component-level before leave guard
-- `useBeforeRouteUpdate(guard: ComponentGuard)`: Component-level before update guard
-
-### Route Configuration
+### 3. Global guards
 
 ```tsx
-const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: HomePage,
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: 'dashboard',
-        name: 'dashboard',
-        component: Dashboard,
-        meta: { title: 'Dashboard' },
-      },
-    ],
-  },
-  {
-    path: '/login',
-    component: LoginPage,
-    meta: { guestOnly: true },
-  },
-  {
-    path: '/users/:id',
-    component: UserProfile,
-    beforeEnter: (to, from) => {
-      // Component-specific guard
-      if (!isAuthenticated()) {
-        return '/login';
-      }
-    },
-  },
-  {
-    path: '/async',
-    component: () => import('./AsyncComponent'),
-    meta: {
-      loadingComponent: <div>Loading...</div>,
-    },
-  },
-  {
-    path: '/redirect',
-    redirect: '/home',
-  },
-  {
-    path: '/custom-redirect',
-    redirect: { path: '/target', query: { from: 'custom' } },
-  },
-];
-```
-
-## 🔒 Route Guards
-
-### Global Guards
-
-```tsx
-const router = createRouter({ routes });
-
-// Before each navigation
 router.beforeEach((to, from) => {
   if (to.meta.requiresAuth && !isAuthenticated()) {
     return '/login';
   }
-
-  if (to.meta.guestOnly && isAuthenticated()) {
-    return '/';
-  }
-
-  return true; // Continue navigation
-});
-
-// After each navigation
-router.afterEach((to, from) => {
-  // Analytics tracking
-  trackPageView(to.fullPath);
-});
-
-// Error handling
-router.onError((error) => {
-  console.error('Navigation error:', error);
+  return true;
 });
 ```
 
-### Component Guards
+### 4. Component-level guards
 
 ```tsx
-import { useBeforeRouteEnter, useBeforeRouteLeave } from '@vureact/router';
+import { useBeforeRouteLeave } from '@vureact/router';
 
-function UserProfile() {
-  useBeforeRouteEnter((to, from) => {
-    // Called before the component is mounted
-    return fetchUserData(to.params.id);
-  });
-
-  useBeforeRouteLeave((to, from) => {
-    // Called before leaving the component
+function EditorPage() {
+  useBeforeRouteLeave(() => {
     if (hasUnsavedChanges()) {
       return confirm('You have unsaved changes. Leave anyway?');
     }
     return true;
   });
 
-  return <div>User Profile</div>;
+  return <div>Editor</div>;
 }
 ```
 
-## 🔄 Async Components & Code Splitting
+## Relationship to Vue Router
 
-```tsx
-const routes = [
-  {
-    path: '/dashboard',
-    component: () => import('./Dashboard'),
-    meta: {
-      loadingComponent: <div className="loading-spinner">Loading dashboard...</div>,
-    },
-  },
-  {
-    path: '/admin',
-    component: lazy(() => import('./AdminPanel')),
-  },
-];
-```
+If you already know Vue Router, most of the API should feel familiar:
 
-## 🎨 Active Link Styling
+| Vue Router | @vureact/router |
+| --- | --- |
+| `createRouter()` | `createRouter()` |
+| `<router-view>` | `<RouterView>` |
+| `<router-link>` | `<RouterLink>` |
+| `useRouter()` | `useRouter()` |
+| `useRoute()` | `useRoute()` |
+| global guards | global guards |
+| route meta | route meta |
 
-```css
-/* Default classes */
-.router-link-active {
-  /* Applied when the link's route is active */
-}
+It is not a source-level port of Vue Router. It is a React-side adaptation layer with a Vue Router-like experience.
 
-.router-link-exact-active {
-  /* Applied when the link's route is exactly active */
-}
+## Repository structure
 
-/* Custom classes */
-.active-link {
-  color: blue;
-  font-weight: bold;
-}
+- `packages/router` - the published npm package `@vureact/router`
 
-.exact-active-link {
-  color: red;
-  border-bottom: 2px solid red;
-}
-```
+## Documentation
 
-```tsx
-<RouterLink to="/about" activeClassName="active-link" exactActiveClassName="exact-active-link">
-  About
-</RouterLink>
-```
+- [Introduction](https://router.vureact.top/en/guide/introduction.html)
+- [Quick Start](https://router.vureact.top/en/guide/introduction.html)
+- [Navigation Guards](https://router.vureact.top/en/guide/guards.html)
+- [API Docs](https://router.vureact.top/en/api/)
+- [Changelog](https://router.vureact.top/en/guide/changelog.html)
 
-## 📝 TypeScript Support
+## Related projects
 
-Full TypeScript support with comprehensive type definitions:
-
-```tsx
-import type {
-  RouteRecordRaw,
-  RouteLocation,
-  RouteLocationOptions,
-  RouterOptions,
-  Router,
-} from '@vureact/router';
-
-// Type-safe route configuration
-const routes: RouteRecordRaw[] = [
-  {
-    path: '/users/:id',
-    name: 'user',
-    component: <UserProfile />,
-    meta: {
-      requiresAuth: true,
-      permissions: ['read'],
-    },
-  },
-];
-
-// Type-safe navigation
-const router = useRouter();
-router.push({ name: 'user', params: { id: '123' } });
-```
-
-## 🔧 Advanced Usage
-
-### Dynamic Route Addition
-
-```tsx
-const router = createRouter({ routes: [] });
-
-// Add routes dynamically
-router.addRoute({
-  path: '/dynamic',
-  component: <DynamicPage />,
-});
-
-// Add nested route
-router.addRoute('parent', {
-  path: 'child',
-  component: <ChildPage />,
-});
-```
-
-### Custom Query Parsing
-
-```tsx
-const router = createRouter({
-  routes,
-  parseQuery: (search) => {
-    // Custom query parsing logic
-    return customParse(search);
-  },
-  stringifyQuery: (query) => {
-    // Custom query stringification
-    return customStringify(query);
-  },
-});
-```
-
-### Route Resolution
-
-```tsx
-const router = createRouter({ routes });
-
-// Resolve a route location
-const location = router.resolve('/users/123?tab=profile');
-// or
-const location = router.resolve({
-  name: 'user',
-  params: { id: '123' },
-  query: { tab: 'profile' },
-});
-
-console.log(location.fullPath); // "/users/123?tab=profile"
-console.log(location.params); // { id: '123' }
-console.log(location.query); // { tab: 'profile' }
-```
-
-## 🤝 Migration from Vue Router
-
-If you're familiar with Vue Router, you'll find @vureact/router very similar:
-
-| Vue Router        | @vureact/router   | Notes               |
-| ----------------- | ----------------- | ------------------- |
-| `createRouter()`  | `createRouter()`  | Same API            |
-| `<router-view>`   | `<RouterView>`    | PascalCase in React |
-| `<router-link>`   | `<RouterLink>`    | PascalCase in React |
-| `useRouter()`     | `useRouter()`     | Same API            |
-| `useRoute()`      | `useRoute()`      | Same API            |
-| Navigation Guards | Navigation Guards | Same guard types    |
-| Route Meta        | Route Meta        | Same functionality  |
-| Nested Routes     | Nested Routes     | Same configuration  |
-
-## 📄 License
-
-MIT © [Ryan John](./LICENSE)
-
-## 🔗 Links
-
-- [VuReact Router](https://router.vureact.top)
-- [Contributing Guidelines](../../CONTRIBUTING.md)
 - [VuReact](https://vureact.top/en)
+- [@vureact/compiler-core](https://vureact.top/en)
+- [@vureact/runtime-core](https://runtime.vureact.top/en)
+
+## Contributing and license
+
+- [Issue tracker](https://github.com/vureact-js/vureact-router/issues)
+- [Contributing guide](./CONTRIBUTING.md)
+
+MIT © Ruihong Zhong (Ryan John)
